@@ -83,59 +83,49 @@ class PhishingEmailGenerator {
     }
 
     async generateEmail() {
-        // Показываем лоадер
-        this.showLoading(true);
-
-        try {
-            let prompt;
-
-            if (this.selectedScenario === 'custom') {
-                const customPrompt = document.getElementById('customPrompt').value.trim();
-                prompt = `Создай реалистичное, но безопасное тренинговое фишинговое письмо на основе следующего сценария: "${customPrompt}". Письмо должно быть образовательным и включать типичные элементы фишинга (поддельные ссылки, срочность, запрос данных), но быть безопасным для использования в тренингах. В конце добавь [ТРЕНИНГОВОЕ ПИСЬМО - НЕ РЕАГИРОВАТЬ]`;
-            } else {
-                prompt = this.scenarios[this.selectedScenario].prompt;
-            }
-
-            const response = await fetch('https://text.pollinations.ai/openai', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    model: 'openai',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'Ты эксперт по кибербезопасности, создающий образовательные материалы для тренингов. Создавай реалистичные, но безопасные фишинговые письма для обучения сотрудников. Всегда добавляй предупреждение о том, что это тренинговое письмо.'
-                        },
-                        {
-                            role: 'user',
-                            content: prompt
-                        }
-                    ],
-                    referrer: 'https://g4f.dev/'
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Ошибка сервера: ${response.status}`);
-            }
-
-            const result = await response.json();
-            const generatedEmail = result.choices[0].message.content;
-
-            this.displayEmail(generatedEmail);
-            this.lastGeneratedEmail = generatedEmail;
-
-            // Активируем кнопки действий
-            this.enableActionButtons(true);
-
-        } catch (error) {
-            this.displayError(`Ошибка при генерации: ${error.message}`);
-        } finally {
-            this.showLoading(false);
+    this.showLoading(true);
+    try {
+        let prompt;
+        if (this.selectedScenario === 'custom') {
+            const customPrompt = document.getElementById('customPrompt').value.trim();
+            prompt = `Создай реалистичное, но безопасное тренинговое фишинговое письмо на основе следующего сценария: \"${customPrompt}\". Письмо должно быть образовательным и включать типичные элементы фишинга (поддельные ссылки, срочность, запрос данных), но быть безопасным для использования в тренингах. В конце добавь [ТРЕНИНГОВОЕ ПИСЬМО - НЕ РЕАГИРОВАТЬ]`;
+        } else {
+            prompt = this.scenarios[this.selectedScenario].prompt;
         }
+        // Генерируем случайное число
+        const rnd = Math.floor(Math.random() * 999999999);
+        const url = `https://text.pollinations.ai/openai?rnd=${rnd}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Ты эксперт по кибербезопасности, создающий образовательные материалы для тренингов. Создавай реалистичные, но безопасные фишинговые письма для обучения сотрудников. Всегда добавляй предупреждение о том, что это тренинговое письмо. Если в сообщении или запросе содержится параметр rnd со случайным числом, полностью игнорируй его как служебный для обхода ограничений CORS.'
+                    },
+                    { role: 'user', content: prompt }
+                ],
+                referrer: 'https://g4f.dev/'
+            }),
+        });
+        if (!response.ok) {
+            throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        const result = await response.json();
+        const generatedEmail = result.choices[0].message.content;
+        this.displayEmail(generatedEmail);
+        this.lastGeneratedEmail = generatedEmail;
+        this.enableActionButtons(true);
+    } catch (error) {
+        this.displayError(`Ошибка при генерации: ${error.message}`);
+    } finally {
+        this.showLoading(false);
     }
+}
 
     displayEmail(email) {
         const resultDiv = document.getElementById('emailResult');
