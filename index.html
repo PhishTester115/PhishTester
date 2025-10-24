@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎣 Генератор тренинговых фишинговых писем</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎣 Генератор тренинговых фишинговых писем</h1>
+            <p class="subtitle">Образовательный инструмент для обучения кибербезопасности</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Панель выбора сценариев -->
+            <section class="scenario-panel">
+                <h2>📋 Выберите сценарий</h2>
+
+                <div class="scenario-grid">
+                    <div class="scenario-card" data-scenario="banking">
+                        <div class="scenario-icon">🏦</div>
+                        <h3>Банковское мошенничество</h3>
+                        <p>Поддельные уведомления от банков</p>
+                    </div>
+                    <div class="scenario-card" data-scenario="social">
+                        <div class="scenario-icon">📱</div>
+                        <h3>Социальные сети</h3>
+                        <p>Фишинг через соцсети и мессенджеры</p>
+                    </div>
+                    <div class="scenario-card" data-scenario="work">
+                        <div class="scenario-icon">🏢</div>
+                        <h3>Корпоративный фишинг</h3>
+                        <p>Письма от коллег и руководства</p>
+                    </div>
+                    <div class="scenario-card" data-scenario="delivery">
+                        <div class="scenario-icon">📦</div>
+                        <h3>Доставка посылок</h3>
+                        <p>Фальшивые уведомления о доставке</p>
+                    </div>
+                    <div class="scenario-card" data-scenario="tech">
+                        <div class="scenario-icon">🔧</div>
+                        <h3>IT поддержка</h3>
+                        <p>Техническая поддержка и обновления</p>
+                    </div>
+                    <div class="scenario-card" data-scenario="prize">
+                        <div class="scenario-icon">🎁</div>
+                        <h3>Выигрыш приза</h3>
+                        <p>Лотереи и розыгрыши</p>
+                    </div>
+                </div>
+
+                <div class="custom-scenario">
+                    <h3>🎯 Или создайте свой сценарий</h3>
+                    <textarea id="customPrompt" placeholder="Опишите желаемый сценарий фишингового письма..."></textarea>
+                </div>
+
+                <button id="generateBtn" class="generate-btn" disabled>
+                    Сгенерировать письмо
+                </button>
+            </section>
+
+            <!-- Панель результата -->
+            <section class="result-panel">
+                <h2>📧 Сгенерированное письмо</h2>
+
+                <div id="emailDisplay" class="email-display">
+                    <div class="placeholder">
+                        <div class="placeholder-icon">📬</div>
+                        <p>Выберите сценарий и нажмите "Сгенерировать письмо" для создания тренингового фишингового сообщения</p>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button id="copyBtn" class="action-btn" disabled>
+                        📋 Копировать
+                    </button>
+                    <button id="regenerateBtn" class="action-btn" disabled>
+                        🔄 Пересоздать
+                    </button>
+                    <button id="saveBtn" class="action-btn" disabled>
+                        💾 Сохранить
+                    </button>
+                    <button id="analyzeBtn" class="action-btn" disabled>
+                        🔍 Анализ письма
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Панель важного предупреждения -->
+        <div class="warning-panel">
+            <div class="warning-content">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-text">
+                    <h3>Важное предупреждение</h3>
+                    <p>Этот инструмент создан исключительно для образовательных целей и обучения кибербезопасности. Все сгенерированные письма предназначены только для тренингов. Использование для реального фишинга является незаконным и строго запрещено.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для анализа -->
+    <div id="analysisModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔍 Анализ фишингового письма</h3>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="analysisContent" class="analysis-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Лоадер -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Генерация фишингового письма...</p>
+    </div>
+
+    <script src="app-1.js"></script>
+</body>
+</html>
