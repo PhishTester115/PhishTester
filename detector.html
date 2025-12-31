@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Детектор фишинга</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .detector-container {
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+
+        .detector-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .detector-header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .detector-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .detector-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 400px;
+        }
+
+        .email-display {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .question-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .question-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .answer-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .answer-button {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .btn-phishing {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-phishing:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .btn-legitimate {
+            background: #51cf66;
+            color: white;
+        }
+
+        .btn-legitimate:hover {
+            background: #40c057;
+            transform: scale(1.05);
+        }
+
+        .btn-phishing:disabled, .btn-legitimate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Styles for Reason Selector */
+        .reason-selector {
+            background: #f1f3f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+            border: 1px solid #e9ecef;
+        }
+
+        .reason-selector.show {
+            display: block;
+        }
+
+        .reason-selector h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            text-align: center;
+        }
+
+        .reason-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .reason-option {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .reason-option:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .reason-option.selected {
+            border-color: #667eea;
+            background: #e7f5ff;
+            color: #0b7285;
+            font-weight: bold;
+        }
+
+        .confirm-reason-btn {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .confirm-reason-btn:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loader Styles */
+        .content-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(102, 126, 234, 0.3);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .analysis-result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .analysis-result.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-correct {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result-incorrect {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .result-analysis {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            line-height: 1.7;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+            position: relative;
+        }
+
+        .reset-stats {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 0.8rem;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 2px 5px;
+        }
+        
+        .reset-stats:hover {
+            color: #ff6b6b;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .next-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .next-button:hover {
+            transform: scale(1.05);
+        }
+
+        .error-message {
+            background: #ffe0e0;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-button">← Вернуться на главную</a>
+
+        <div class="detector-header">
+            <h1>🔍 Детектор фишинга</h1>
+            <p>Определите, является ли письмо фишингом или обычным сообщением</p>
+        </div>
+
+        <div class="detector-content">
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-value" id="correctCount">0</div>
+                    <div class="stat-label">Правильных ответов</div>
+                </div>
+                <div class="stat-card">
+                    <button id="resetStatsBtn" class="reset-stats" title="Сбросить статистику">↺</button>
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">Всего попыток</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="percentCount">0%</div>
+                    <div class="stat-label">Процент правильных</div>
+                </div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div id="initialLoader" class="content-loader">
+                <div class="loading-spinner"></div>
+                <p>Генерируем уникальное письмо для тренировки...</p>
+            </div>
+
+            <div id="emailSection" style="display: none;">
+                <h3 style="text-align: center; color: #333; margin-bottom: 15px;">📩 Анализируемое письмо:</h3>
+                <div class="email-display" id="emailContent"></div>
+
+                <div class="question-section">
+                    <h2>Это фишинг?</h2>
+                    <div class="answer-buttons">
+                        <button class="answer-button btn-phishing" id="phishingBtn">
+                            ⚠️ Это фишинг
+                        </button>
+                        <button class="answer-button btn-legitimate" id="legitimateBtn">
+                            ✓ Это обычное письмо
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Новый блок для выбора причин -->
+                <div id="reasonSelector" class="reason-selector">
+                    <h3>Почему это письмо подозрительное?</h3>
+                    <div id="reasonOptions" class="reason-options">
+                        <!-- Опции будут добавлены через JS -->
+                    </div>
+                    <button id="confirmReasonBtn" class="confirm-reason-btn" disabled>Подтвердить ответ</button>
+                </div>
+
+                <div class="analysis-result" id="analysisResult">
+                    <div class="result-title" id="resultTitle"></div>
+                    <div class="result-analysis" id="resultAnalysis"></div>
+                    <button class="next-button" id="nextBtn">Следующее письмо</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="detector.js"></script>
+</body>
+</html>
